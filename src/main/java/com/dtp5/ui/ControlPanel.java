@@ -2,6 +2,7 @@ package com.dtp5.ui;
 
 import com.dtp5.config.SimulationConfig;
 import com.dtp5.model.Ocean;
+import com.dtp5.model.EnvironmentalField;
 
 import javax.swing.*;
 import java.awt.*;
@@ -18,10 +19,15 @@ public class ControlPanel extends JPanel {
     private JLabel fpsLabel;
     private JLabel fishCountLabel;
     private JLabel obstacleCountLabel;
+    private JLabel birthsLabel;
+    private JLabel deathsLabel;
+    private JLabel energyLabel;
     private ModernButton pauseButton;
     private ModernButton addFishButton;
     private ModernButton addSharkButton;
     private ModernButton fishermanButton;
+    private ModernButton planktonButton;
+    private ModernButton currentsButton;
     private JSlider speedSlider;
 
     private long lastUpdateTime;
@@ -40,51 +46,180 @@ public class ControlPanel extends JPanel {
     }
 
     private void setupUI() {
-        setLayout(new FlowLayout(FlowLayout.CENTER, 15, 10));
+        setLayout(new BorderLayout(10, 5));
         setBackground(new Color(20, 20, 30, 220)); // Dark semi-transparent
         setPreferredSize(new Dimension(
                 SimulationConfig.WINDOW_WIDTH,
-                70)); // Slightly taller for modern look
+                90)); // Taller to fit all controls
 
-        // Stats Panel
-        JPanel statsPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 15, 0));
-        statsPanel.setOpaque(false);
+        // Left Panel - Control Buttons
+        JPanel leftPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 5));
+        leftPanel.setOpaque(false);
 
-        fpsLabel = createLabel("FPS: 0.0");
-        fishCountLabel = createLabel("Fish: " + ocean.poissons.length);
-        obstacleCountLabel = createLabel("Obstacles: 0");
-
-        statsPanel.add(fpsLabel);
-        statsPanel.add(fishCountLabel);
-        statsPanel.add(obstacleCountLabel);
-        add(statsPanel);
-
-        // Separator
-        add(createSeparator());
-
-        // Controls
         pauseButton = new ModernButton("⏸ Pause", new Color(255, 165, 0));
         pauseButton.addActionListener(e -> {
             // Logic handled by OceanJPanel, button state updated via setPaused
         });
-        add(pauseButton);
+        leftPanel.add(pauseButton);
 
+        // Add Fish Dropdown Button
+        JPanel addFishPanel = new JPanel(new BorderLayout());
+        addFishPanel.setOpaque(false);
         addFishButton = new ModernButton("🐟 Add Fish", new Color(0, 191, 255));
-        addFishButton.addActionListener(e -> ocean.addFish());
-        add(addFishButton);
+        addFishButton.addActionListener(e -> ocean.addFish(1));
+        addFishPanel.add(addFishButton, BorderLayout.CENTER);
+        
+        // Dropdown menu for fish count
+        JComboBox<String> fishCountCombo = new JComboBox<>(new String[]{"Add 1", "Add 10", "Add 50", "Add 100", "Add 500"});
+        fishCountCombo.setPreferredSize(new Dimension(95, 32));
+        fishCountCombo.setBackground(new Color(50, 50, 60));
+        fishCountCombo.setForeground(Color.WHITE);
+        fishCountCombo.setFont(new Font("Segoe UI", Font.BOLD, 11));
+        fishCountCombo.setBorder(BorderFactory.createEmptyBorder(2, 5, 2, 5));
+        fishCountCombo.setRenderer(new DefaultListCellRenderer() {
+            @Override
+            public Component getListCellRendererComponent(JList<?> list, Object value, int index,
+                    boolean isSelected, boolean cellHasFocus) {
+                Component c = super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+                if (isSelected) {
+                    c.setBackground(new Color(0, 191, 255));
+                    c.setForeground(Color.WHITE);
+                } else {
+                    c.setBackground(new Color(50, 50, 60));
+                    c.setForeground(Color.WHITE);
+                }
+                return c;
+            }
+        });
+        fishCountCombo.addActionListener(e -> {
+            String selected = (String) fishCountCombo.getSelectedItem();
+            int count = 1;
+            if (selected != null) {
+                if (selected.contains("10")) count = 10;
+                else if (selected.contains("50")) count = 50;
+                else if (selected.contains("100")) count = 100;
+                else if (selected.contains("500")) count = 500;
+            }
+            ocean.addFish(count);
+            fishCountCombo.setSelectedIndex(0); // Reset to first option
+        });
+        addFishPanel.add(fishCountCombo, BorderLayout.EAST);
+        leftPanel.add(addFishPanel);
 
         addSharkButton = new ModernButton("🦈 Shark", new Color(255, 69, 0));
         addSharkButton.addActionListener(e -> ocean.addShark());
-        add(addSharkButton);
+        leftPanel.add(addSharkButton);
 
         fishermanButton = new ModernButton("🎣 Fish", new Color(147, 112, 219));
         fishermanButton.addActionListener(e -> ocean.toggleFisherman());
-        add(fishermanButton);
+        leftPanel.add(fishermanButton);
 
-        // Speed Slider
+        planktonButton = new ModernButton("🟢 Plankton", new Color(60, 179, 113));
+        planktonButton.addActionListener(e -> ocean.spawnPlanktonPatch());
+        leftPanel.add(planktonButton);
+
+        currentsButton = new ModernButton("🌊 Currents", new Color(70, 130, 180));
+        currentsButton.addActionListener(e -> {
+            ocean.showCurrents = !ocean.showCurrents;
+            currentsButton.setBaseColor(ocean.showCurrents ? new Color(70, 130, 180) : new Color(90, 90, 90));
+        });
+        leftPanel.add(currentsButton);
+
+        // Separator
+        leftPanel.add(createSeparator());
+
+        // Current Pattern Buttons
+        ModernButton calmButton = new ModernButton("😌 Calm", new Color(100, 150, 200));
+        calmButton.addActionListener(e -> ocean.environmentalField.setPattern(EnvironmentalField.CurrentPattern.CALM));
+        leftPanel.add(calmButton);
+        
+        ModernButton swirlButton = new ModernButton("🌀 Swirl", new Color(70, 130, 180));
+        swirlButton.addActionListener(e -> ocean.environmentalField.setPattern(EnvironmentalField.CurrentPattern.SWIRL));
+        leftPanel.add(swirlButton);
+        
+        ModernButton strongButton = new ModernButton("💪 Strong", new Color(200, 100, 100));
+        strongButton.addActionListener(e -> ocean.environmentalField.setPattern(EnvironmentalField.CurrentPattern.STRONG));
+        leftPanel.add(strongButton);
+        
+        ModernButton whirlpoolButton = new ModernButton("🌪️ Whirl", new Color(150, 100, 200));
+        whirlpoolButton.addActionListener(e -> ocean.environmentalField.setPattern(EnvironmentalField.CurrentPattern.WHIRLPOOL));
+        leftPanel.add(whirlpoolButton);
+
+        add(leftPanel, BorderLayout.WEST);
+
+        // Center Panel - Stats
+        JPanel centerPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 15, 0));
+        centerPanel.setOpaque(false);
+
+        fpsLabel = createLabel("FPS: 0.0");
+        fishCountLabel = createLabel("Fish: " + ocean.poissons.length);
+        obstacleCountLabel = createLabel("Obstacles: 0");
+        birthsLabel = createLabel("Births: 0");
+        deathsLabel = createLabel("Deaths: 0");
+        energyLabel = createLabel("Avg E: 0");
+
+        centerPanel.add(fpsLabel);
+        centerPanel.add(fishCountLabel);
+        centerPanel.add(obstacleCountLabel);
+        centerPanel.add(birthsLabel);
+        centerPanel.add(deathsLabel);
+        centerPanel.add(energyLabel);
+
+        add(centerPanel, BorderLayout.CENTER);
+
+        // Right Panel - Sliders
+        JPanel rightPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 8, 5));
+        rightPanel.setOpaque(false);
+
+        // Current Strength Slider
+        JPanel currentStrengthPanel = new JPanel(new BorderLayout());
+        currentStrengthPanel.setOpaque(false);
+        JLabel currentStrengthLabel = new JLabel("Current");
+        currentStrengthLabel.setForeground(Color.WHITE);
+        currentStrengthLabel.setFont(new Font("Segoe UI", Font.PLAIN, 10));
+        currentStrengthLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        currentStrengthPanel.add(currentStrengthLabel, BorderLayout.NORTH);
+        
+        JSlider currentStrengthSlider = new JSlider(0, 200, 100); // 0-200% (0.0-2.0)
+        currentStrengthSlider.setPreferredSize(new Dimension(100, 20));
+        currentStrengthSlider.setOpaque(false);
+        currentStrengthSlider.setBackground(new Color(0, 0, 0, 0));
+        currentStrengthSlider.addChangeListener(e -> {
+            int value = currentStrengthSlider.getValue();
+            double strength = value / 100.0; // Convert to 0.0-2.0 range
+            ocean.environmentalField.setCurrentStrength(strength);
+        });
+        currentStrengthPanel.add(currentStrengthSlider, BorderLayout.CENTER);
+        rightPanel.add(currentStrengthPanel);
+
+        // Current Speed Slider
+        JPanel currentSpeedPanel = new JPanel(new BorderLayout());
+        currentSpeedPanel.setOpaque(false);
+        JLabel currentSpeedLabel = new JLabel("Speed");
+        currentSpeedLabel.setForeground(Color.WHITE);
+        currentSpeedLabel.setFont(new Font("Segoe UI", Font.PLAIN, 10));
+        currentSpeedLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        currentSpeedPanel.add(currentSpeedLabel, BorderLayout.NORTH);
+        
+        JSlider currentSpeedSlider = new JSlider(0, 300, 100); // 0-300% (0.0-3.0)
+        currentSpeedSlider.setPreferredSize(new Dimension(100, 20));
+        currentSpeedSlider.setOpaque(false);
+        currentSpeedSlider.setBackground(new Color(0, 0, 0, 0));
+        currentSpeedSlider.addChangeListener(e -> {
+            int value = currentSpeedSlider.getValue();
+            double speed = value / 100.0; // Convert to 0.0-3.0 range
+            ocean.environmentalField.setAnimationSpeed(speed);
+        });
+        currentSpeedPanel.add(currentSpeedSlider, BorderLayout.CENTER);
+        rightPanel.add(currentSpeedPanel);
+
+        // Separator
+        rightPanel.add(createSeparator());
+
+        // Simulation Speed Slider
         JPanel sliderPanel = new JPanel(new BorderLayout());
         sliderPanel.setOpaque(false);
-        JLabel speedLabel = new JLabel("Speed");
+        JLabel speedLabel = new JLabel("Sim Speed");
         speedLabel.setForeground(Color.WHITE);
         speedLabel.setFont(new Font("Segoe UI", Font.PLAIN, 10));
         speedLabel.setHorizontalAlignment(SwingConstants.CENTER);
@@ -95,7 +230,9 @@ public class ControlPanel extends JPanel {
         speedSlider.setOpaque(false);
         speedSlider.setBackground(new Color(0, 0, 0, 0));
         sliderPanel.add(speedSlider, BorderLayout.CENTER);
-        add(sliderPanel);
+        rightPanel.add(sliderPanel);
+
+        add(rightPanel, BorderLayout.EAST);
     }
 
     private JLabel createLabel(String text) {
@@ -126,6 +263,9 @@ public class ControlPanel extends JPanel {
 
         fishCountLabel.setText("Fish: " + ocean.poissons.length);
         obstacleCountLabel.setText("Obstacles: " + ocean.obstacles.size());
+        birthsLabel.setText("Births: " + ocean.stats.getBirths());
+        deathsLabel.setText("Deaths: " + ocean.stats.getDeaths());
+        energyLabel.setText("Avg E: " + fpsFormat.format(ocean.stats.getAvgEnergy()));
     }
 
     public JButton getPauseButton() {

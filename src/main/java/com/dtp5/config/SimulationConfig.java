@@ -15,7 +15,8 @@ public class SimulationConfig {
     public static final boolean START_FULLSCREEN = false;
 
     // === SIMULATION SETTINGS ===
-    public static final int INITIAL_FISH_COUNT = 300;
+    public static final int INITIAL_FISH_COUNT = 500;
+    public static final int INITIAL_PLANKTON_PATCHES = 15;
     public static final int TIMER_DELAY_MS = 16; // ~60 FPS
 
     // === SPATIAL PARTITIONING ===
@@ -66,6 +67,21 @@ public class SimulationConfig {
     // === ANIMATION SETTINGS ===
     public static final double ROTATION_SMOOTHING = 0.15; // Lower = smoother but slower
     public static final int TAIL_ANIMATION_SPEED = 10; // Frames per tail wave cycle
+
+    // === ECOSYSTEM SETTINGS ===
+    public static final double BASE_ENERGY = 1200.0;
+    public static final double ENERGY_DECAY_PER_TICK = 0.35;
+    public static final double FEED_ENERGY_GAIN = 180.0;
+    public static final double REPRODUCTION_THRESHOLD = 1400.0;
+    public static final double REPRODUCTION_COST = 600.0;
+    public static final double CURRENT_INFLUENCE = 0.35;
+    public static final int ENV_FIELD_CELLS = 32;
+    public static final double ENV_FIELD_TIME_SCALE = 0.0015;
+    public static final double PLANKTON_MAX_BIOMASS = 400.0;
+    public static final double PLANKTON_REGEN_RATE = 0.8;
+    public static final double PLANKTON_FEED_RADIUS = 28.0;
+    public static final int MAX_FISH = 1800;
+    public static final int MAX_SHARKS = 35;
 
     // === UI CONTROL PANEL ===
     public static final int CONTROL_PANEL_HEIGHT = 60;

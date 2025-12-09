@@ -12,6 +12,10 @@ public class Poisson extends Objet {
     public double vitesseX;
     public double vitesseY;
 
+    // Ecosystem state
+    public double energy;
+    public boolean alive = true;
+
     // Visual properties
     public Color color;
     public LinkedList<Point2D.Double> trail;
@@ -45,6 +49,9 @@ public class Poisson extends Objet {
 
         // Initialize trail
         trail = new LinkedList<>();
+
+        // Base energy
+        energy = com.dtp5.config.SimulationConfig.BASE_ENERGY;
     }
 
     private static FishSpecies getRandomSpecies() {
@@ -114,34 +121,53 @@ public class Poisson extends Objet {
      * Avoids walls by adjusting velocity when near boundaries.
      */
     protected boolean EviterMurs(double murXMin, double murYMin, double murXMax, double murYMax) {
-        // Clamp position to walls
+        boolean turned = false;
+
+        // Clamp hard bounds to keep aquarium framing
         if (posX < murXMin) {
             posX = murXMin;
-        } else if (posY < murYMin) {
-            posY = murYMin;
+            vitesseX = Math.abs(vitesseX);
+            turned = true;
         } else if (posX > murXMax) {
             posX = murXMax;
-        } else if (posY > murYMax) {
-            posY = murYMax;
+            vitesseX = -Math.abs(vitesseX);
+            turned = true;
         }
 
-        // Change direction when approaching walls
-        double distance = DistanceAuMur(murXMin, murYMin, murXMax, murYMax);
-        double turnDistance = species.getMinDistance() * 3;
-        if (distance < turnDistance) {
-            if (distance == (posX - murXMin)) {
-                vitesseX += species.speed * 0.3;
-            } else if (distance == (posY - murYMin)) {
-                vitesseY += species.speed * 0.3;
-            } else if (distance == (murXMax - posX)) {
-                vitesseX -= species.speed * 0.3;
-            } else if (distance == (murYMax - posY)) {
-                vitesseY -= species.speed * 0.3;
-            }
-            Normaliser();
-            return true;
+        if (posY < murYMin) {
+            posY = murYMin;
+            vitesseY = Math.abs(vitesseY);
+            turned = true;
+        } else if (posY > murYMax) {
+            posY = murYMax;
+            vitesseY = -Math.abs(vitesseY);
+            turned = true;
         }
-        return false;
+
+        // Soft steering when near glass to keep fish inside frame
+        double padding = species.getMinDistance() * 2.5;
+        double push = species.speed * 0.25;
+
+        if (posX - murXMin < padding) {
+            vitesseX += push;
+            turned = true;
+        } else if (murXMax - posX < padding) {
+            vitesseX -= push;
+            turned = true;
+        }
+
+        if (posY - murYMin < padding) {
+            vitesseY += push;
+            turned = true;
+        } else if (murYMax - posY < padding) {
+            vitesseY -= push;
+            turned = true;
+        }
+
+        if (turned) {
+            Normaliser();
+        }
+        return turned;
     }
 
     /**
@@ -269,7 +295,8 @@ public class Poisson extends Objet {
      * Now uses spatial grid for efficient neighbor queries.
      */
     public void MiseAJour(List<Poisson> nearbyFish, ArrayList<ZoneAEviter> obstacles,
-            List<Shark> sharks, double largeur, double hauteur) {
+            List<Shark> sharks, List<PlanktonPatch> planktons, EnvironmentalField field,
+            double largeur, double hauteur) {
         if (!EviterMurs(0, 0, largeur, hauteur)) {
             if (!EviterRequins(sharks)) {
                 if (!EviterObstacles(obstacles)) {
@@ -279,6 +306,37 @@ public class Poisson extends Objet {
                 }
             }
         }
+        applyEnvironmentalField(field);
         MiseAJourPosition();
+        updateEnergy(planktons);
+        checkVitality();
+    }
+
+    private void applyEnvironmentalField(EnvironmentalField field) {
+        Point2D.Double vec = field.sampleVector(posX, posY);
+        vitesseX += vec.x * com.dtp5.config.SimulationConfig.CURRENT_INFLUENCE;
+        vitesseY += vec.y * com.dtp5.config.SimulationConfig.CURRENT_INFLUENCE;
+        Normaliser();
+    }
+
+    private void updateEnergy(List<PlanktonPatch> planktons) {
+        energy -= com.dtp5.config.SimulationConfig.ENERGY_DECAY_PER_TICK;
+        for (PlanktonPatch patch : planktons) {
+            double r = patch.getRadius();
+            double dx = patch.posX - posX;
+            double dy = patch.posY - posY;
+            double distSq = dx * dx + dy * dy;
+            if (distSq < r * r) {
+                double gained = patch.consume(com.dtp5.config.SimulationConfig.FEED_ENERGY_GAIN);
+                energy += gained;
+                break;
+            }
+        }
+    }
+
+    private void checkVitality() {
+        if (energy <= 0) {
+            alive = false;
+        }
     }
 }
