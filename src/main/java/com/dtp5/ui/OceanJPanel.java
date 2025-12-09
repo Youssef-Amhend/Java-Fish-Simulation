@@ -1,13 +1,8 @@
 package com.dtp5.ui;
 
 import com.dtp5.config.SimulationConfig;
-import com.dtp5.model.Ocean;
-import com.dtp5.model.Poisson;
-import com.dtp5.model.ZoneAEviter;
-import com.dtp5.model.PlanktonPatch;
-import com.dtp5.model.EnvironmentalField;
-import com.dtp5.renderer.FishRenderer;
-import com.dtp5.renderer.ObstacleRenderer;
+import com.dtp5.model.*;
+import com.dtp5.renderer.*;
 
 import javax.swing.*;
 import java.awt.*;
@@ -20,22 +15,36 @@ import java.beans.PropertyChangeListener;
 import java.util.Random;
 
 /**
- * Main panel for rendering the ocean simulation with beautiful graphics and
- * double buffering.
+ * Main panel for rendering the ocean simulation with beautiful graphics.
+ * Features:
+ * <ul>
+ * <li>Double-buffered rendering for smooth animation</li>
+ * <li>Day/night cycle with dynamic lighting</li>
+ * <li>Particle effects (bubbles, splash)</li>
+ * <li>Multiple creature types with unique renderers</li>
+ * <li>Environmental effects (caustics, currents, waves)</li>
+ * </ul>
+ * 
+ * @author Ocean Ecosystem Team
+ * @version 2.0.0
  */
 public class OceanJPanel extends JPanel implements PropertyChangeListener, MouseListener {
+
     protected Ocean ocean;
     protected Timer timer;
     private ControlPanel controlPanel;
     private int baseDelay;
 
-    // Double buffering for smooth rendering
+    // Double buffering
     private BufferedImage backBuffer;
     private Graphics2D backGraphics;
 
     // Caustic light effect
     private Caustic[] caustics;
-    private Random random = new Random();
+    private final Random random = new Random();
+
+    // Moon for night rendering
+    private double moonPhase = 0;
 
     public OceanJPanel() {
         this.setBackground(SimulationConfig.OCEAN_BOTTOM_COLOR);
@@ -56,7 +65,7 @@ public class OceanJPanel extends JPanel implements PropertyChangeListener, Mouse
                 this.getHeight());
         ocean.addPropertyChangeListener(this);
 
-        // Create and add control panel
+        // Create control panel
         controlPanel = new ControlPanel(ocean);
 
         // Setup pause button
@@ -78,13 +87,11 @@ public class OceanJPanel extends JPanel implements PropertyChangeListener, Mouse
         });
 
         // Setup add fish button
-        controlPanel.getAddFishButton().addActionListener(e -> {
-            ocean.addFish();
-        });
+        controlPanel.getAddFishButton().addActionListener(e -> ocean.addFish());
 
         // Start timer
-        timer = new javax.swing.Timer(baseDelay, e -> {
-            ocean.MiseAJourOcean();
+        timer = new Timer(baseDelay, e -> {
+            ocean.updateOcean();
             controlPanel.updateStats();
         });
         timer.start();
@@ -128,7 +135,7 @@ public class OceanJPanel extends JPanel implements PropertyChangeListener, Mouse
         // Render to back buffer
         renderScene(backGraphics);
 
-        // Draw back buffer to screen (double buffering)
+        // Draw back buffer to screen
         g.drawImage(backBuffer, 0, 0, null);
     }
 
@@ -136,64 +143,173 @@ public class OceanJPanel extends JPanel implements PropertyChangeListener, Mouse
      * Renders the entire scene to the provided graphics context.
      */
     private void renderScene(Graphics2D g2d) {
-        // Draw ocean background with depth
-        drawEnhancedOceanBackground(g2d);
+        boolean isNight = ocean.dayNightEnabled && !ocean.dayNightCycle.isDaytime();
+        float lightLevel = ocean.dayNightEnabled ? ocean.dayNightCycle.getLightLevel() : 1.0f;
 
-        // Draw caustic light effects
-        drawCaustics(g2d);
+        // Draw ocean background with dynamic lighting
+        drawDynamicBackground(g2d);
 
-        // Draw rocks at the bottom (behind everything)
+        // Draw moon at night
+        if (isNight && ocean.dayNightEnabled) {
+            drawMoon(g2d);
+        }
+
+        // Draw caustic light effects (dimmer at night)
+        drawCaustics(g2d, lightLevel);
+
+        // Draw coral (behind rocks)
+        drawCoral(g2d);
+
+        // Draw rocks
         drawRocks(g2d);
-        
-        // Draw algae (behind fish but above rocks)
+
+        // Draw algae
         drawAlgae(g2d);
 
-        // Draw plankton fields beneath fish
+        // Draw plankton
         if (ocean.showPlankton) {
             drawPlankton(g2d);
         }
 
+        // Draw current vectors
         if (ocean.showCurrents) {
             drawCurrents(g2d);
         }
 
-        // Draw obstacles first (behind fish)
+        // Draw obstacles
         for (ZoneAEviter o : ocean.obstacles) {
             ObstacleRenderer.render(o, g2d);
         }
 
-        // Draw fish on top
+        // Draw sea turtles (behind fish)
+        for (SeaTurtle turtle : ocean.seaTurtles) {
+            SeaTurtleRenderer.render(turtle, g2d, ocean.getFrameCount());
+        }
+
+        // Draw fish
         for (Poisson p : ocean.poissons) {
             FishRenderer.render(p, g2d, ocean.getFrameCount());
         }
 
-        // Draw Sharks
-        for (com.dtp5.model.Shark s : ocean.sharks) {
-            com.dtp5.renderer.SharkRenderer.render(s, g2d);
+        // Draw sharks
+        for (Shark s : ocean.sharks) {
+            SharkRenderer.render(s, g2d);
         }
 
-        // Draw Fisherman
-        com.dtp5.renderer.FishermanRenderer.render(ocean.fisherman, g2d);
+        // Draw jellyfish (with glow at night)
+        for (Jellyfish j : ocean.jellyfish) {
+            JellyfishRenderer.render(j, g2d, ocean.getFrameCount(), isNight);
+        }
 
+        // Draw fisherman
+        FishermanRenderer.render(ocean.fisherman, g2d);
+
+        // Draw particles
+        if (ocean.particlesEnabled) {
+            ocean.particleSystem.render(g2d);
+        }
+
+        // Draw glass vignette
         drawGlassVignette(g2d);
 
-        // Overlay control panel is now a Swing component at the top
+        // Draw night overlay
+        if (isNight && ocean.dayNightEnabled) {
+            drawNightOverlay(g2d, lightLevel);
+        }
+
+        // Draw time indicator
+        if (ocean.dayNightEnabled) {
+            drawTimeIndicator(g2d);
+        }
+    }
+
+    private void drawDynamicBackground(Graphics2D g2d) {
+        int height = getHeight();
+        int width = getWidth();
+
+        Color topColor, bottomColor;
+
+        if (ocean.dayNightEnabled) {
+            topColor = ocean.dayNightCycle.getSkyTopColor();
+            bottomColor = ocean.dayNightCycle.getSkyBottomColor();
+        } else {
+            topColor = SimulationConfig.OCEAN_TOP_COLOR;
+            bottomColor = SimulationConfig.OCEAN_BOTTOM_COLOR;
+        }
+
+        GradientPaint gradient = new GradientPaint(0, 0, topColor, 0, height, bottomColor);
+        g2d.setPaint(gradient);
+        g2d.fillRect(0, 0, width, height);
+
+        // Surface waves
+        drawSurfaceWaves(g2d, width, height);
+    }
+
+    private void drawMoon(Graphics2D g2d) {
+        moonPhase += 0.001;
+        float visibility = ocean.dayNightCycle.getMoonVisibility();
+        if (visibility <= 0)
+            return;
+
+        int moonX = getWidth() - 120;
+        int moonY = 80;
+        int moonRadius = 40;
+
+        // Glow
+        for (int i = 5; i > 0; i--) {
+            int glowRadius = moonRadius + i * 15;
+            int alpha = (int) (20 * visibility / i);
+            g2d.setColor(new Color(200, 220, 255, alpha));
+            g2d.fillOval(moonX - glowRadius, moonY - glowRadius, glowRadius * 2, glowRadius * 2);
+        }
+
+        // Moon body
+        int alpha = (int) (255 * visibility);
+        g2d.setColor(new Color(230, 240, 255, alpha));
+        g2d.fillOval(moonX - moonRadius, moonY - moonRadius, moonRadius * 2, moonRadius * 2);
+
+        // Craters (subtle)
+        g2d.setColor(new Color(200, 210, 230, (int) (100 * visibility)));
+        g2d.fillOval(moonX - 15, moonY - 10, 12, 10);
+        g2d.fillOval(moonX + 5, moonY + 5, 8, 8);
+        g2d.fillOval(moonX - 5, moonY + 12, 6, 5);
+    }
+
+    private void drawNightOverlay(Graphics2D g2d, float lightLevel) {
+        // Very subtle blue overlay for night
+        int alpha = (int) ((1.0f - lightLevel) * 60);
+        g2d.setColor(new Color(10, 20, 50, alpha));
+        g2d.fillRect(0, 0, getWidth(), getHeight());
+    }
+
+    private void drawTimeIndicator(Graphics2D g2d) {
+        String time = ocean.dayNightCycle.getTimeString();
+        String period = ocean.dayNightCycle.getPeriodName();
+
+        g2d.setFont(new Font("Segoe UI", Font.BOLD, 12));
+        g2d.setColor(new Color(255, 255, 255, 180));
+        g2d.drawString(time + " " + period, 10, getHeight() - 10);
+    }
+
+    private void drawCoral(Graphics2D g2d) {
+        for (Coral coral : ocean.corals) {
+            CoralRenderer.render(coral, g2d, ocean.getFrameCount());
+        }
     }
 
     private void drawRocks(Graphics2D g2d) {
-        for (com.dtp5.model.Rock rock : ocean.rocks) {
-            com.dtp5.renderer.RockRenderer.render(rock, g2d);
+        for (Rock rock : ocean.rocks) {
+            RockRenderer.render(rock, g2d);
         }
     }
-    
+
     private void drawAlgae(Graphics2D g2d) {
         long frameCount = ocean != null ? ocean.getFrameCount() : 0;
         EnvironmentalField.VectorCell[][] cells = ocean.environmentalField.getCells();
         double cellW = ocean.environmentalField.getCellWidth();
         double cellH = ocean.environmentalField.getCellHeight();
-        
-        for (com.dtp5.model.Algae a : ocean.algae) {
-            // Get current at algae base
+
+        for (Algae a : ocean.algae) {
             int cellX = (int) (a.baseX / cellW);
             int cellY = (int) (a.baseY / cellH);
             double vx = 0, vy = 0;
@@ -201,10 +317,10 @@ public class OceanJPanel extends JPanel implements PropertyChangeListener, Mouse
                 vx = cells[cellX][cellY].vx;
                 vy = cells[cellX][cellY].vy;
             }
-            com.dtp5.renderer.AlgaeRenderer.render(a, g2d, frameCount, vx, vy);
+            AlgaeRenderer.render(a, g2d, frameCount, vx, vy);
         }
     }
-    
+
     private void drawPlankton(Graphics2D g2d) {
         for (PlanktonPatch patch : ocean.planktons) {
             float alpha = (float) Math.min(0.45, 0.2 + patch.getBiomass() / SimulationConfig.PLANKTON_MAX_BIOMASS);
@@ -228,11 +344,10 @@ public class OceanJPanel extends JPanel implements PropertyChangeListener, Mouse
                 double vx = cells[x][y].vx;
                 double vy = cells[x][y].vy;
                 double len = Math.sqrt(vx * vx + vy * vy);
-                double scale = 18 * Math.tanh(len); // smooth arrow lengths
+                double scale = 18 * Math.tanh(len);
                 double endX = centerX + vx * scale;
                 double endY = centerY + vy * scale;
 
-                // Color encodes temperature (warmer = more red, colder = blue)
                 double temp = cells[x][y].temperature;
                 float tNorm = (float) Math.max(0, Math.min(1, (temp - 14) / 12.0));
                 Color c = new Color(
@@ -242,7 +357,7 @@ public class OceanJPanel extends JPanel implements PropertyChangeListener, Mouse
                         140);
                 g2d.setColor(c);
                 g2d.drawLine((int) centerX, (int) centerY, (int) endX, (int) endY);
-                // Arrow head
+
                 if (len > 0.01) {
                     double angle = Math.atan2(vy, vx);
                     int ah = 4;
@@ -257,41 +372,17 @@ public class OceanJPanel extends JPanel implements PropertyChangeListener, Mouse
         }
     }
 
-    /**
-     * Draws a multi-layer gradient ocean background with depth.
-     */
-    private void drawEnhancedOceanBackground(Graphics2D g2d) {
-        int height = getHeight();
-        int width = getWidth();
-
-        // Multi-stop gradient for realistic depth
-        GradientPaint gradient = new GradientPaint(
-                0, 0, SimulationConfig.OCEAN_TOP_COLOR,
-                0, height, SimulationConfig.OCEAN_BOTTOM_COLOR);
-        g2d.setPaint(gradient);
-        g2d.fillRect(0, 0, width, height);
-
-        // Add subtle wave patterns at surface
-        drawSurfaceWaves(g2d, width, height);
-    }
-
-    /**
-     * Draws animated caustic light patterns.
-     */
-    private void drawCaustics(Graphics2D g2d) {
+    private void drawCaustics(Graphics2D g2d, float lightLevel) {
         long frame = ocean != null ? ocean.getFrameCount() : 0;
         int width = getWidth();
         int height = getHeight();
 
         for (Caustic c : caustics) {
             c.update(frame, width, height);
-            c.draw(g2d, width, height);
+            c.draw(g2d, width, height, lightLevel);
         }
     }
 
-    /**
-     * Draws subtle wave patterns near the surface.
-     */
     private void drawSurfaceWaves(Graphics2D g2d, int width, int height) {
         long frame = ocean != null ? ocean.getFrameCount() : 0;
 
@@ -304,14 +395,11 @@ public class OceanJPanel extends JPanel implements PropertyChangeListener, Mouse
         }
     }
 
-    /**
-     * Glass vignette to keep the scene framed like an aquarium.
-     */
     private void drawGlassVignette(Graphics2D g2d) {
         int w = getWidth();
         int h = getHeight();
         Color edge = new Color(0, 0, 0, 60);
-        // Darken edges
+
         g2d.setPaint(new GradientPaint(0, 0, edge, w / 2f, 0, new Color(0, 0, 0, 0), true));
         g2d.fillRect(0, 0, w, h);
         g2d.setPaint(new GradientPaint(w, 0, edge, w / 2f, 0, new Color(0, 0, 0, 0), true));
@@ -321,30 +409,14 @@ public class OceanJPanel extends JPanel implements PropertyChangeListener, Mouse
         g2d.setPaint(new GradientPaint(0, h, edge, 0, h / 2f, new Color(0, 0, 0, 0), true));
         g2d.fillRect(0, 0, w, h);
 
-        // Soft highlight along the top like water surface reflection
         g2d.setPaint(new GradientPaint(0, 0, new Color(255, 255, 255, 60), 0, 80, new Color(255, 255, 255, 0)));
         g2d.fillRect(0, 0, w, 120);
     }
 
-    /**
-     * Draws control panel as overlay.
-     */
-    /**
-     * Draws control panel as overlay.
-     * (Deprecated: Control panel is now a Swing component at the top)
-     */
-    private void drawOverlayControlPanel(Graphics2D g2d) {
-        // No-op
-    }
-
     @Override
     public void mouseClicked(MouseEvent e) {
-        // Add obstacles anywhere in ocean
         if (ocean != null) {
-            ocean.AjouterObstacle(
-                    e.getX(),
-                    e.getY(),
-                    SimulationConfig.DEFAULT_OBSTACLE_RADIUS);
+            ocean.addObstacle(e.getX(), e.getY(), SimulationConfig.DEFAULT_OBSTACLE_RADIUS);
         }
     }
 
@@ -387,12 +459,9 @@ public class OceanJPanel extends JPanel implements PropertyChangeListener, Mouse
 
         void update(long frame, int width, int height) {
             phase += speed;
-
-            // Slowly drift
             x += Math.sin(phase) * 0.0003;
             y += Math.cos(phase * 1.3) * 0.0002;
 
-            // Wrap around
             if (x < 0)
                 x = 1;
             if (x > 1)
@@ -403,9 +472,9 @@ public class OceanJPanel extends JPanel implements PropertyChangeListener, Mouse
                 y = 0;
         }
 
-        void draw(Graphics2D g2d, int width, int height) {
+        void draw(Graphics2D g2d, int width, int height, float lightLevel) {
             double intensity = (Math.sin(phase) + 1) / 2;
-            int alpha = (int) (SimulationConfig.CAUSTIC_ALPHA * 255 * intensity);
+            int alpha = (int) (SimulationConfig.CAUSTIC_ALPHA * 255 * intensity * lightLevel);
 
             g2d.setColor(new Color(255, 255, 255, alpha));
 
