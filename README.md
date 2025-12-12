@@ -8,6 +8,8 @@
 
 **A stunning, high-performance ocean simulation featuring realistic fish schooling, predator-prey dynamics, day/night cycles, and beautiful visual effects.**
 
+![Ocean Ecosystem Simulation](assets/screenshot.png)
+
 [Features](#-features) • [Getting Started](#-getting-started) • [Controls](#-controls) • [Architecture](#-architecture) • [Configuration](#-configuration)
 
 </div>
