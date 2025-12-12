@@ -6,6 +6,8 @@ import com.dtp5.renderer.*;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.geom.Ellipse2D;
@@ -56,6 +58,16 @@ public class OceanJPanel extends JPanel implements PropertyChangeListener, Mouse
         for (int i = 0; i < caustics.length; i++) {
             caustics[i] = new Caustic();
         }
+
+        // Add resize listener to update ocean dimensions when window size changes
+        this.addComponentListener(new ComponentAdapter() {
+            @Override
+            public void componentResized(ComponentEvent e) {
+                if (ocean != null) {
+                    ocean.setDimensions(getWidth(), getHeight());
+                }
+            }
+        });
     }
 
     public void Lancer() {
@@ -106,8 +118,12 @@ public class OceanJPanel extends JPanel implements PropertyChangeListener, Mouse
         if (w > 0 && h > 0) {
             backBuffer = new BufferedImage(w, h, BufferedImage.TYPE_INT_RGB);
             backGraphics = backBuffer.createGraphics();
-            backGraphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-            backGraphics.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+            // Use speed-optimized rendering hints for higher FPS
+            backGraphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF);
+            backGraphics.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_SPEED);
+            backGraphics.setRenderingHint(RenderingHints.KEY_COLOR_RENDERING, RenderingHints.VALUE_COLOR_RENDER_SPEED);
+            backGraphics.setRenderingHint(RenderingHints.KEY_ALPHA_INTERPOLATION,
+                    RenderingHints.VALUE_ALPHA_INTERPOLATION_SPEED);
         }
     }
 

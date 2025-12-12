@@ -4,3 +4,9 @@
 2025-12-12 16:13:21.293 [AWT-EventQueue-0] INFO  com.dtp5.model.Ocean - Ocean initialization complete
 2025-12-12 16:14:47.291 [AWT-EventQueue-0] INFO  com.dtp5.model.Ocean - Initializing ocean: 1536.0x864.0 with 500 fish
 2025-12-12 16:14:47.357 [AWT-EventQueue-0] INFO  com.dtp5.model.Ocean - Ocean initialization complete
+2025-12-12 16:19:34.217 [AWT-EventQueue-0] INFO  com.dtp5.model.Ocean - Initializing ocean: 1536.0x864.0 with 500 fish
+2025-12-12 16:19:34.269 [AWT-EventQueue-0] INFO  com.dtp5.model.Ocean - Ocean initialization complete
+2025-12-12 16:23:09.995 [AWT-EventQueue-0] INFO  com.dtp5.model.Ocean - Initializing ocean: 1536.0x864.0 with 300 fish
+2025-12-12 16:23:10.043 [AWT-EventQueue-0] INFO  com.dtp5.model.Ocean - Ocean initialization complete
+2025-12-12 16:34:14.277 [AWT-EventQueue-0] INFO  com.dtp5.model.Ocean - Initializing ocean: 1536.0x864.0 with 300 fish
+2025-12-12 16:34:14.334 [AWT-EventQueue-0] INFO  com.dtp5.model.Ocean - Ocean initialization complete

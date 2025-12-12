@@ -15,9 +15,9 @@ public class SimulationConfig {
     public static final boolean START_FULLSCREEN = true;
 
     // === SIMULATION SETTINGS ===
-    public static final int INITIAL_FISH_COUNT = 500;
-    public static final int INITIAL_PLANKTON_PATCHES = 15;
-    public static final int TIMER_DELAY_MS = 16; // ~60 FPS
+    public static final int INITIAL_FISH_COUNT = 300;
+    public static final int INITIAL_PLANKTON_PATCHES = 12;
+    public static final int TIMER_DELAY_MS = 8; // ~120 FPS target
 
     // === SPATIAL PARTITIONING ===
     public static final int GRID_CELL_SIZE = 100; // pixels
@@ -54,8 +54,8 @@ public class SimulationConfig {
     public static final Color OCEAN_TOP_COLOR = new Color(0, 105, 148); // Deep ocean blue
     public static final Color OCEAN_MIDDLE_COLOR = new Color(0, 119, 190); // Medium blue
     public static final Color OCEAN_BOTTOM_COLOR = new Color(13, 27, 42); // Very dark blue
-    public static final int CAUSTIC_COUNT = 30;
-    public static final float CAUSTIC_ALPHA = 0.15f;
+    public static final int CAUSTIC_COUNT = 15;
+    public static final float CAUSTIC_ALPHA = 0.12f;
 
     // === OBSTACLE SETTINGS ===
     public static final double DEFAULT_OBSTACLE_RADIUS = 30.0;
@@ -81,6 +81,7 @@ public class SimulationConfig {
     public static final double PLANKTON_REGEN_RATE = 0.8;
     public static final double PLANKTON_FEED_RADIUS = 28.0;
     public static final int MAX_FISH = 1800;
+    public static final int MIN_FISH = 20; // Minimum fish to maintain
     public static final int MAX_SHARKS = 35;
 
     // === UI CONTROL PANEL ===

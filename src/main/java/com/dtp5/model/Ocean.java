@@ -428,6 +428,23 @@ public class Ocean {
         return height;
     }
 
+    /**
+     * Updates the ocean dimensions when the window is resized.
+     * This ensures fish stay within the visible boundaries.
+     */
+    public void setDimensions(double newWidth, double newHeight) {
+        if (newWidth > 0 && newHeight > 0) {
+            this.width = newWidth;
+            this.height = newHeight;
+
+            // Update spatial grid for new dimensions
+            this.spatialGrid = new SpatialGrid(newWidth, newHeight, SimulationConfig.GRID_CELL_SIZE);
+
+            // Update environmental field
+            this.environmentalField = new EnvironmentalField(newWidth, newHeight);
+        }
+    }
+
     // ==================== UPDATE METHODS ====================
 
     /**
@@ -478,6 +495,9 @@ public class Ocean {
 
         // Update fisherman
         updateFisherman();
+
+        // Dynamic fish population - maintain minimum count
+        maintainFishPopulation();
 
         frameCount++;
         support.firePropertyChange("oceanUpdated", null, this);
@@ -595,6 +615,46 @@ public class Ocean {
                     particleSystem.spawnSplash(fisherman.posX, fisherman.posY, 5);
                 }
             }
+        }
+    }
+
+    /**
+     * Maintains minimum fish population by spawning new fish when count drops too
+     * low.
+     */
+    private void maintainFishPopulation() {
+        int currentCount = poissons.length;
+        int minCount = SimulationConfig.MIN_FISH;
+
+        if (currentCount < minCount) {
+            // Spawn fish gradually (up to 5 per frame to avoid sudden visual jumps)
+            int toSpawn = Math.min(5, minCount - currentCount);
+
+            Poisson[] newPoissons = new Poisson[currentCount + toSpawn];
+            System.arraycopy(poissons, 0, newPoissons, 0, currentCount);
+
+            for (int i = 0; i < toSpawn; i++) {
+                // Spawn at random edge of screen for natural entry
+                double x, y;
+                if (random.nextBoolean()) {
+                    // Spawn from sides
+                    x = random.nextBoolean() ? 10 : width - 10;
+                    y = random.nextDouble() * height;
+                } else {
+                    // Spawn from top/bottom
+                    x = random.nextDouble() * width;
+                    y = random.nextBoolean() ? 10 : height - 10;
+                }
+
+                newPoissons[currentCount + i] = new Poisson(
+                        x, y,
+                        random.nextDouble() * 2 * Math.PI);
+
+                stats.recordBirth();
+            }
+
+            poissons = newPoissons;
+            logger.debug("Spawned {} fish to maintain minimum population", toSpawn);
         }
     }
 
