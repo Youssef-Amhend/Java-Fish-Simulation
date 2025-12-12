@@ -65,13 +65,18 @@ public class ControlPanel extends JPanel {
         setBackground(new Color(20, 20, 30, 230));
         setPreferredSize(new Dimension(SimulationConfig.WINDOW_WIDTH, 100));
 
-        // Left Panel - Control Buttons
-        JPanel leftPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 6, 5));
+        // Left Panel - Control Buttons organized in two rows
+        JPanel leftPanel = new JPanel();
+        leftPanel.setLayout(new BoxLayout(leftPanel, BoxLayout.Y_AXIS));
         leftPanel.setOpaque(false);
+
+        // Top row - Creature buttons
+        JPanel topRow = new JPanel(new FlowLayout(FlowLayout.LEFT, 4, 2));
+        topRow.setOpaque(false);
 
         // Pause button
         pauseButton = new ModernButton("⏸ Pause", new Color(255, 165, 0));
-        leftPanel.add(pauseButton);
+        topRow.add(pauseButton);
 
         // Add Fish with dropdown
         JPanel addFishPanel = new JPanel(new BorderLayout());
@@ -89,35 +94,38 @@ public class ControlPanel extends JPanel {
             fishCountCombo.setSelectedIndex(0);
         });
         addFishPanel.add(fishCountCombo, BorderLayout.EAST);
-        leftPanel.add(addFishPanel);
+        topRow.add(addFishPanel);
 
         // Shark button
         addSharkButton = new ModernButton("🦈 Shark", new Color(255, 69, 0));
         addSharkButton.addActionListener(e -> ocean.addShark());
-        leftPanel.add(addSharkButton);
+        topRow.add(addSharkButton);
 
-        // Jellyfish button (NEW)
+        // Jellyfish button
         jellyfishButton = new ModernButton("🎐 Jelly", new Color(186, 85, 211));
         jellyfishButton.addActionListener(e -> ocean.addJellyfish());
-        leftPanel.add(jellyfishButton);
+        topRow.add(jellyfishButton);
 
-        // Sea Turtle button (NEW)
+        // Sea Turtle button
         turtleButton = new ModernButton("🐢 Turtle", new Color(60, 179, 113));
         turtleButton.addActionListener(e -> ocean.addSeaTurtle());
-        leftPanel.add(turtleButton);
+        topRow.add(turtleButton);
 
         // Fisherman button
-        fishermanButton = new ModernButton("🎣 Fish", new Color(147, 112, 219));
+        fishermanButton = new ModernButton("🎣 Fisher", new Color(147, 112, 219));
         fishermanButton.addActionListener(e -> ocean.toggleFisherman());
-        leftPanel.add(fishermanButton);
+        topRow.add(fishermanButton);
 
         // Plankton button
         planktonButton = new ModernButton("🟢 Plankton", new Color(50, 205, 50));
         planktonButton.addActionListener(e -> ocean.spawnPlanktonPatch());
-        leftPanel.add(planktonButton);
+        topRow.add(planktonButton);
 
-        // Separator
-        leftPanel.add(createSeparator());
+        leftPanel.add(topRow);
+
+        // Bottom row - Toggle and pattern buttons
+        JPanel bottomRow = new JPanel(new FlowLayout(FlowLayout.LEFT, 4, 2));
+        bottomRow.setOpaque(false);
 
         // Currents toggle
         currentsButton = new ModernButton("🌊 Currents", new Color(70, 130, 180));
@@ -125,44 +133,46 @@ public class ControlPanel extends JPanel {
             ocean.showCurrents = !ocean.showCurrents;
             currentsButton.setBaseColor(ocean.showCurrents ? new Color(70, 130, 180) : new Color(90, 90, 90));
         });
-        leftPanel.add(currentsButton);
+        bottomRow.add(currentsButton);
 
-        // Day/Night toggle (NEW)
+        // Day/Night toggle
         dayNightButton = new ModernButton("🌙 Day/Night", new Color(100, 100, 180));
         dayNightButton.addActionListener(e -> {
             ocean.dayNightEnabled = !ocean.dayNightEnabled;
             dayNightButton.setBaseColor(ocean.dayNightEnabled ? new Color(100, 100, 180) : new Color(90, 90, 90));
         });
-        leftPanel.add(dayNightButton);
+        bottomRow.add(dayNightButton);
 
-        // Particles toggle (NEW)
+        // Particles toggle
         particlesButton = new ModernButton("💫 Bubbles", new Color(100, 180, 220));
         particlesButton.addActionListener(e -> {
             ocean.particlesEnabled = !ocean.particlesEnabled;
             particlesButton.setBaseColor(ocean.particlesEnabled ? new Color(100, 180, 220) : new Color(90, 90, 90));
         });
-        leftPanel.add(particlesButton);
+        bottomRow.add(particlesButton);
 
         // Separator
-        leftPanel.add(createSeparator());
+        bottomRow.add(createSeparator());
 
         // Current pattern buttons
         ModernButton calmButton = new ModernButton("😌 Calm", new Color(100, 150, 200));
-        calmButton.setPreferredSize(new Dimension(80, 30));
+        calmButton.setPreferredSize(new Dimension(75, 30));
         calmButton.addActionListener(e -> ocean.environmentalField.setPattern(EnvironmentalField.CurrentPattern.CALM));
-        leftPanel.add(calmButton);
+        bottomRow.add(calmButton);
 
         ModernButton swirlButton = new ModernButton("🌀 Swirl", new Color(70, 130, 180));
-        swirlButton.setPreferredSize(new Dimension(80, 30));
+        swirlButton.setPreferredSize(new Dimension(75, 30));
         swirlButton
                 .addActionListener(e -> ocean.environmentalField.setPattern(EnvironmentalField.CurrentPattern.SWIRL));
-        leftPanel.add(swirlButton);
+        bottomRow.add(swirlButton);
 
         ModernButton whirlButton = new ModernButton("🌪️ Whirl", new Color(150, 100, 200));
-        whirlButton.setPreferredSize(new Dimension(80, 30));
+        whirlButton.setPreferredSize(new Dimension(75, 30));
         whirlButton.addActionListener(
                 e -> ocean.environmentalField.setPattern(EnvironmentalField.CurrentPattern.WHIRLPOOL));
-        leftPanel.add(whirlButton);
+        bottomRow.add(whirlButton);
+
+        leftPanel.add(bottomRow);
 
         add(leftPanel, BorderLayout.WEST);
 

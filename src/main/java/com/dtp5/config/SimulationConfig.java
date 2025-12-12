@@ -12,7 +12,7 @@ public class SimulationConfig {
     public static final int WINDOW_WIDTH = 1600;
     public static final int WINDOW_HEIGHT = 900;
     public static final String WINDOW_TITLE = "Ocean Ecosystem Simulation";
-    public static final boolean START_FULLSCREEN = false;
+    public static final boolean START_FULLSCREEN = true;
 
     // === SIMULATION SETTINGS ===
     public static final int INITIAL_FISH_COUNT = 500;
