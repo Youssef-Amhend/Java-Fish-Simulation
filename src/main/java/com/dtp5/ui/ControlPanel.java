@@ -78,6 +78,11 @@ public class ControlPanel extends JPanel {
         pauseButton = new ModernButton("⏸ Pause", new Color(255, 165, 0));
         topRow.add(pauseButton);
 
+        // Exit button
+        ModernButton exitButton = new ModernButton("❌ Exit", new Color(220, 53, 69));
+        exitButton.addActionListener(e -> System.exit(0));
+        topRow.add(exitButton);
+
         // Add Fish with dropdown
         JPanel addFishPanel = new JPanel(new BorderLayout());
         addFishPanel.setOpaque(false);

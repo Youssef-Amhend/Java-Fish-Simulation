@@ -10,3 +10,64 @@
 2025-12-12 16:23:10.043 [AWT-EventQueue-0] INFO  com.dtp5.model.Ocean - Ocean initialization complete
 2025-12-12 16:34:14.277 [AWT-EventQueue-0] INFO  com.dtp5.model.Ocean - Initializing ocean: 1536.0x864.0 with 300 fish
 2025-12-12 16:34:14.334 [AWT-EventQueue-0] INFO  com.dtp5.model.Ocean - Ocean initialization complete
+2025-12-12 16:36:44.322 [AWT-EventQueue-0] INFO  com.dtp5.model.Ocean - Initializing ocean: 1536.0x864.0 with 300 fish
+2025-12-12 16:36:44.368 [AWT-EventQueue-0] INFO  com.dtp5.model.Ocean - Ocean initialization complete
+2025-12-12 16:39:55.994 [AWT-EventQueue-0] INFO  com.dtp5.model.Ocean - Initializing ocean: 1536.0x864.0 with 300 fish
+2025-12-12 16:39:56.038 [AWT-EventQueue-0] INFO  com.dtp5.model.Ocean - Ocean initialization complete
+2025-12-12 16:43:28.773 [main] INFO  com.dtp5.model.Ocean - Initializing ocean: 800.0x600.0 with 50 fish
+2025-12-12 16:43:28.843 [main] INFO  com.dtp5.model.Ocean - Ocean initialization complete
+2025-12-12 16:43:28.847 [main] INFO  com.dtp5.model.Ocean - Shutting down ocean
+2025-12-12 16:43:28.858 [main] INFO  com.dtp5.model.Ocean - Initializing ocean: 800.0x600.0 with 50 fish
+2025-12-12 16:43:28.860 [main] INFO  com.dtp5.model.Ocean - Ocean initialization complete
+2025-12-12 16:43:28.863 [main] INFO  com.dtp5.model.Ocean - Initializing ocean: 800.0x600.0 with 50 fish
+2025-12-12 16:43:28.864 [main] INFO  com.dtp5.model.Ocean - Ocean initialization complete
+2025-12-12 16:43:28.866 [main] INFO  com.dtp5.model.Ocean - Initializing ocean: 800.0x600.0 with 50 fish
+2025-12-12 16:43:28.867 [main] INFO  com.dtp5.model.Ocean - Ocean initialization complete
+2025-12-12 16:43:28.873 [main] INFO  com.dtp5.model.Ocean - Initializing ocean: 800.0x600.0 with 50 fish
+2025-12-12 16:43:28.875 [main] INFO  com.dtp5.model.Ocean - Ocean initialization complete
+2025-12-12 16:43:28.880 [main] INFO  com.dtp5.model.Ocean - Initializing ocean: 800.0x600.0 with 50 fish
+2025-12-12 16:43:28.881 [main] INFO  com.dtp5.model.Ocean - Ocean initialization complete
+2025-12-12 16:43:28.889 [main] INFO  com.dtp5.model.Ocean - Initializing ocean: 800.0x600.0 with 50 fish
+2025-12-12 16:43:28.890 [main] INFO  com.dtp5.model.Ocean - Ocean initialization complete
+2025-12-12 16:43:28.936 [main] INFO  com.dtp5.model.Ocean - Initializing ocean: 800.0x600.0 with 50 fish
+2025-12-12 16:43:28.937 [main] INFO  com.dtp5.model.Ocean - Ocean initialization complete
+2025-12-12 16:43:28.956 [main] INFO  com.dtp5.model.Ocean - Initializing ocean: 800.0x600.0 with 50 fish
+2025-12-12 16:43:28.957 [main] INFO  com.dtp5.model.Ocean - Ocean initialization complete
+2025-12-12 16:43:28.964 [main] INFO  com.dtp5.model.Ocean - Initializing ocean: 800.0x600.0 with 50 fish
+2025-12-12 16:43:28.964 [main] INFO  com.dtp5.model.Ocean - Ocean initialization complete
+2025-12-12 16:43:28.965 [main] INFO  com.dtp5.model.Ocean - Initializing ocean: 800.0x600.0 with 50 fish
+2025-12-12 16:43:28.966 [main] INFO  com.dtp5.model.Ocean - Ocean initialization complete
+2025-12-12 16:43:28.967 [main] INFO  com.dtp5.model.Ocean - Initializing ocean: 800.0x600.0 with 50 fish
+2025-12-12 16:43:28.968 [main] INFO  com.dtp5.model.Ocean - Ocean initialization complete
+2025-12-12 16:43:28.969 [main] INFO  com.dtp5.model.Ocean - Initializing ocean: 800.0x600.0 with 50 fish
+2025-12-12 16:43:28.969 [main] INFO  com.dtp5.model.Ocean - Ocean initialization complete
+2025-12-12 16:43:28.971 [main] INFO  com.dtp5.model.Ocean - Initializing ocean: 800.0x600.0 with 50 fish
+2025-12-12 16:43:28.971 [main] INFO  com.dtp5.model.Ocean - Ocean initialization complete
+2025-12-12 16:43:28.973 [main] INFO  com.dtp5.model.Ocean - Initializing ocean: 800.0x600.0 with 50 fish
+2025-12-12 16:43:28.975 [main] INFO  com.dtp5.model.Ocean - Ocean initialization complete
+2025-12-12 16:43:28.975 [main] INFO  com.dtp5.model.Ocean - Initializing ocean: 800.0x600.0 with 50 fish
+2025-12-12 16:43:28.976 [main] INFO  com.dtp5.model.Ocean - Ocean initialization complete
+2025-12-12 16:43:28.978 [main] INFO  com.dtp5.model.Ocean - Initializing ocean: 800.0x600.0 with 50 fish
+2025-12-12 16:43:28.979 [main] INFO  com.dtp5.model.Ocean - Ocean initialization complete
+2025-12-12 16:43:28.981 [main] INFO  com.dtp5.model.Ocean - Initializing ocean: 800.0x600.0 with 50 fish
+2025-12-12 16:43:28.982 [main] INFO  com.dtp5.model.Ocean - Ocean initialization complete
+2025-12-12 16:43:28.984 [main] INFO  com.dtp5.model.Ocean - Initializing ocean: 800.0x600.0 with 50 fish
+2025-12-12 16:43:28.984 [main] INFO  com.dtp5.model.Ocean - Ocean initialization complete
+2025-12-12 16:43:28.985 [main] INFO  com.dtp5.model.Ocean - Initializing ocean: 800.0x600.0 with 50 fish
+2025-12-12 16:43:28.985 [main] INFO  com.dtp5.model.Ocean - Ocean initialization complete
+2025-12-12 16:43:28.987 [main] INFO  com.dtp5.model.Ocean - Initializing ocean: 800.0x600.0 with 50 fish
+2025-12-12 16:43:28.987 [main] INFO  com.dtp5.model.Ocean - Ocean initialization complete
+2025-12-12 16:43:28.988 [main] INFO  com.dtp5.model.Ocean - Initializing ocean: 800.0x600.0 with 50 fish
+2025-12-12 16:43:28.989 [main] INFO  com.dtp5.model.Ocean - Ocean initialization complete
+2025-12-12 16:43:28.990 [main] INFO  com.dtp5.model.Ocean - Initializing ocean: 800.0x600.0 with 50 fish
+2025-12-12 16:43:28.990 [main] INFO  com.dtp5.model.Ocean - Ocean initialization complete
+2025-12-12 16:43:28.992 [main] INFO  com.dtp5.model.Ocean - Initializing ocean: 800.0x600.0 with 50 fish
+2025-12-12 16:43:28.993 [main] INFO  com.dtp5.model.Ocean - Ocean initialization complete
+2025-12-12 16:43:28.993 [main] INFO  com.dtp5.model.Ocean - Initializing ocean: 800.0x600.0 with 50 fish
+2025-12-12 16:43:28.993 [main] INFO  com.dtp5.model.Ocean - Ocean initialization complete
+2025-12-12 16:43:28.996 [main] INFO  com.dtp5.model.Ocean - Initializing ocean: 800.0x600.0 with 50 fish
+2025-12-12 16:43:28.996 [main] INFO  com.dtp5.model.Ocean - Ocean initialization complete
+2025-12-12 16:43:28.997 [main] INFO  com.dtp5.model.Ocean - Initializing ocean: 800.0x600.0 with 50 fish
+2025-12-12 16:43:28.997 [main] INFO  com.dtp5.model.Ocean - Ocean initialization complete
+2025-12-12 16:43:35.805 [AWT-EventQueue-0] INFO  com.dtp5.model.Ocean - Initializing ocean: 1536.0x864.0 with 300 fish
+2025-12-12 16:43:35.851 [AWT-EventQueue-0] INFO  com.dtp5.model.Ocean - Ocean initialization complete
